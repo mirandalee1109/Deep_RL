@@ -10,6 +10,14 @@ import random
 SIZE_X=6
 SIZE_Y=5
 
+T=15
+
+ACTIONS = [np.array([0, -1]),
+           np.array([-1, 0]),
+           np.array([0, 1]),
+           np.array([1, 0]),
+           np.array([0, 0])]
+
 def min_move(position):
 
     moves = []
@@ -30,32 +38,35 @@ def min_move(position):
 
 
 
-def draw_image(image, player_path, min_path):
+def draw_image(player_path, min_path):
     fig, ax = plt.subplots()
     ax.set_axis_off()
     tb = Table(ax, bbox=[0, 0, 1, 1])
 
-    nrows, ncols = image.shape
+    ncols = SIZE_X
+    nrows = SIZE_Y
+
     width, height = 1.0 / ncols, 1.0 / nrows
 
     # Add cells
-    for (i,j), val in np.ndenumerate(image):
-        # Index either the first or second item of bkg_colors based on
-        # a checker board pattern
-        idx = [j % 2, (j + 1) % 2][i % 2]
-        color = 'white'
+    for i in range(SIZE_Y):
+        for j in range(SIZE_X):
+            # Index either the first or second item of bkg_colors based on
+            # a checker board pattern
+            idx = [j % 2, (j + 1) % 2][i % 2]
+            color = 'white'
 
-        if i==4 and j==4:
-            tb.add_cell(i, j, width, height,
-                        loc='center', edgecolor='#63b1f2', facecolor='#9bb4db')
+            if i==4 and j==4:
+                tb.add_cell(i, j, width, height,
+                            loc='center', edgecolor='#63b1f2', facecolor='#9bb4db')
 
-        elif i==0 and j==0:
-            tb.add_cell(i, j, width, height,
-                        loc='center', edgecolor='#63b1f2', facecolor='#9fe592')
+            elif i==0 and j==0:
+                tb.add_cell(i, j, width, height,
+                            loc='center', edgecolor='#63b1f2', facecolor='#9fe592')
 
-        else:
-            tb.add_cell(i, j, width, height,
-                        loc='center', edgecolor='#63b1f2', facecolor=color)
+            else:
+                tb.add_cell(i, j, width, height,
+                            loc='center', edgecolor='#63b1f2', facecolor=color)
     # Row Labels...
     for i, label in enumerate(range(SIZE_Y)):
         tb.add_cell(i, -1, width, height, text=label+1, loc='right',
@@ -101,27 +112,39 @@ def draw_image(image, player_path, min_path):
 
     ax.add_collection(lc)
 
-if __name__ == '__main__':
-
-    values = np.zeros((SIZE_Y, SIZE_X))
-
-    player_path = [[0,0],[0,1],[0,2],[0,3],[1,3],[2,3],[3,3],[4,3],[5,3],[5,4],[4,4]]
-
-    min_path=[[4,4]]
-
-    last = [4,4]
-
-    #Later len() will be T=15 or whatever
-    for i in range(len(player_path)):
-        last = min_move(last)
-        min_path.append(last)
-
-
-
-
-    draw_image(values, player_path, min_path)
-
     plt.savefig('./figure_4_1.png')
     plt.close()
+
+
+def simulate(values):
+
+    min_path=[[4,4]]
+    player_path = [[0,0]]
+
+    for t in range(T):
+        pos_min = min_path[-1]
+        pos_player = player_path[-1]
+
+        new_pos_player = pos_player + ACTIONS[values[pos_player[1]][pos_player[0]][pos_min[1]][pos_min[0]]]
+
+        player_path.append(new_pos_player)
+        min_path.append(min_move(pos_min))
+
+
+
+    return player_path,min_path
+
+
+if __name__ == '__main__':
+
+    #REPLACE THIS WITH REAL VALUES
+    values = np.zeros((SIZE_Y, SIZE_X, SIZE_Y, SIZE_X), dtype=int)
+    #values = np.random.randint(0,5,size=(SIZE_Y, SIZE_X, SIZE_Y, SIZE_X))
+
+    player_path, min_path = simulate(values)
+
+    draw_image(player_path, min_path)
+
+
 
     print("Done")
