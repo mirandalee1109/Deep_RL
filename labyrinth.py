@@ -116,10 +116,12 @@ def draw_image(player_path, min_path):
     plt.close()
 
 
-def simulate(values):
+def simulate(values, T):
 
     min_path=[[4,4]]
     player_path = [[0,0]]
+
+    win = False
 
     for t in range(T):
         pos_min = min_path[-1]
@@ -130,21 +132,35 @@ def simulate(values):
         player_path.append(new_pos_player)
         min_path.append(min_move(pos_min))
 
+        if new_pos_player[0] == 4 and new_pos_player[1] == 4:
+            win = True
+            break
 
 
-    return player_path,min_path
+    return player_path, min_path, win
 
 
 if __name__ == '__main__':
 
     #REPLACE THIS WITH REAL VALUES
     values = np.zeros((SIZE_Y, SIZE_X, SIZE_Y, SIZE_X), dtype=int)
-    #values = np.random.randint(0,5,size=(SIZE_Y, SIZE_X, SIZE_Y, SIZE_X))
+    values.fill(4)
 
-    player_path, min_path = simulate(values)
+    win_counter = 0
+
+    #Example for drawing
+    player_path, min_path, _ = simulate(values)
+
+    total_simulations = 10000
+    for i in range(total_simulations):
+        _, _, win = simulate(values)
+
+        if win:
+            win_counter += 1
 
     draw_image(player_path, min_path)
 
-
+    print("Total wins:" + str(win_counter))
+    print("Out of:" + str(total_simulations))
 
     print("Done")
