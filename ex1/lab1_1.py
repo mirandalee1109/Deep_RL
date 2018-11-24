@@ -189,48 +189,47 @@ def value_iteration():
 
  # compute the optimal policy
     policy = []
-    while t <= T:
-        for m in range(0, WORLD_Y):
-            for n in range(0, WORLD_X):
-                # all possible positions of minotaur
-                for x in range(0, WORLD_Y):
-                    for y in range(0, WORLD_X):
-                        # each position of me
-                        if (m == x and n == y):
-                            #or (m == next_x and n == next_y):
-                        # minotaur not in the (x,y) and (next_x, next_y)
-                            continue
+    for m in range(0, WORLD_Y):
+        for n in range(0, WORLD_X):
+            # all possible positions of minotaur
+            for x in range(0, WORLD_Y):
+                for y in range(0, WORLD_X):
+                    # each position of me
+                    if (m == x and n == y):
+                        #or (m == next_x and n == next_y):
+                    # minotaur not in the (x,y) and (next_x, next_y)
+                        continue
 
-                        action_returns = []
-                        act_returns = []
-                        for action in ACTIONS:
-                            (next_x, next_y) = step([x, y], action)
-                            if (next_x != x or next_y != y):
-                                action_value = []
-                                count = 4
-                                # count of the num of min to go in each dir
-                                for act in ACTIONS_MIN:
-                                    (next_m, next_n) = minotaur_step([m, n], act)
-                                    if (next_m == m and next_n == n):
-                                        count -= 1 # this action is not applicable
+                    action_returns = []
+                    act_returns = []
+                    for action in ACTIONS:
+                        (next_x, next_y) = step([x, y], action)
+                        if (next_x != x or next_y != y):
+                            action_value = []
+                            count = 4
+                            # count of the num of min to go in each dir
+                            for act in ACTIONS_MIN:
+                                (next_m, next_n) = minotaur_step([m, n], act)
+                                if (next_m == m and next_n == n):
+                                    count -= 1 # this action is not applicable
 
-                                prob_state = 1/count # prob of min going each dir
+                            prob_state = 1/count # prob of min going each dir
 
-                                for act in ACTIONS_MIN:
-                                    (next_m, next_n) = minotaur_step([m, n], act)
-                                    if (next_m != m or next_n != n):
-                                        if (next_m == next_x) and (next_n == next_y): # end up in the same cell
-                                            action_value.append(np.round(prob_state * (reward_death + state_value[next_x, next_y]), 4))
-                                        elif next_x == 4 and next_y == 4:# win
-                                            action_value.append(np.round(prob_state * (reward_win + state_value[next_x, next_y]), 4))
-                                        else:
-                                            action_value.append(np.round(prob_state * (state_value[next_x, next_y]), 4))
+                            for act in ACTIONS_MIN:
+                                (next_m, next_n) = minotaur_step([m, n], act)
+                                if (next_m != m or next_n != n):
+                                    if (next_m == next_x) and (next_n == next_y): # end up in the same cell
+                                        action_value.append(np.round(prob_state * (reward_death + state_value[next_x, next_y]), 4))
+                                    elif next_x == 4 and next_y == 4:# win
+                                        action_value.append(np.round(prob_state * (reward_win + state_value[next_x, next_y]), 4))
+                                    else:
+                                        action_value.append(np.round(prob_state * (state_value[next_x, next_y]), 4))
 
-                                action_returns.append(np.sum(action_value))
-                                act_returns.append(action)
+                            action_returns.append(np.sum(action_value))
+                            act_returns.append(action)
 
-                policy.append(act_returns[np.argmax(action_returns)])
-                #policy(m, n, x, y)= policy[m*WORLD_Y+n*WORLD_X+x*WORLD_X + y]
+            policy.append(act_returns[np.argmax(action_returns)])
+            #policy(m, n, x, y)= policy[m*WORLD_Y+n*WORLD_X+x*WORLD_X + y]
 
     #For using at the simulation
     return policy

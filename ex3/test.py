@@ -3,6 +3,7 @@
 import numpy as np
 import operator
 import matplotlib.pyplot as plt
+import random
 
 class GridWorld:
     ## Initialise starting data
@@ -10,19 +11,18 @@ class GridWorld:
         # Set information about the gridworld
         self.height = 4
         self.width = 4
-        self.grid = np.zeros(( self.height, self.width)) - 1
+        self.grid = np.zeros(( self.height, self.width))
 
         # Set start location for the agent
         self.current_location = ( 0,0)
 
-        # Set locations for the bomb and the gold
+
         self.police_location = (3,3)
-        self.gold_location = (0,3)
-        self.terminal_states = [ self.bomb_location, self.gold_location]
+        self.bank_location = (1,1)
 
         # Set grid rewards for special cells
-        self.grid[ self.bomb_location[0], self.bomb_location[1]] = -10
-        self.grid[ self.gold_location[0], self.gold_location[1]] = 10
+        self.grid[ self.bank_location[0], self.bank_location[1]] = 1
+        self.police_reward = -10
 
         # Set available actions
         self.actions = ['UP', 'DOWN', 'LEFT', 'RIGHT', 'STAY']
@@ -33,15 +33,28 @@ class GridWorld:
         """Returns possible actions"""
         return self.actions
 
-    def agent_on_map(self):
-        """Prints out current location of the agent on the grid (used for debugging)"""
-        grid = np.zeros(( self.height, self.width))
-        grid[ self.current_location[0], self.current_location[1]] = 1
-        return grid
-
     def get_reward(self, new_location):
         """Returns the reward for an input position"""
         return self.grid[ new_location[0], new_location[1]]
+
+    #Moving the police randomly
+    def move_police(self):
+        moves = []
+        position = self.police_location
+        if position[0] > 0:
+            moves.append(np.array([-1, 0]))
+
+        if position[0] < self.width -1:
+            moves.append(np.array([1, 0]))
+
+        if position[1] > 0:
+            moves.append(np.array([0, -1]))
+
+        if position[1] < self.height -1:
+            moves.append(np.array([0, 1]))
+
+        self.police_location = position + random.choice(moves)
+
 
 
     def make_step(self, action):
@@ -86,13 +99,20 @@ class GridWorld:
                 self.current_location = ( self.current_location[0], self.current_location[1] + 1)
                 reward = self.get_reward(self.current_location)
 
+        # STAY
+        elif action == 'STAY':
+            # Stay still, collect reward
+            reward = self.get_reward(last_location)
+
+        self.move_police()
+
+        if self.police_location[0] == self.current_location[0] and self.police_location[1] == self.current_location[1]:
+            reward = self.police_reward = -10
+            self.current_location = (0,0)
+            self.police_location = (3,3)
+
+
         return reward
-
-    def check_state(self):
-        """Check if the agent is in a terminal state (gold or bomb), if so return 'TERMINAL'"""
-        if self.current_location in self.terminal_states:
-            return 'TERMINAL'
-
 
 class RandomAgent():
     # Choose a random action
@@ -108,7 +128,7 @@ class Q_Agent():
         self.q_table = dict() # Store all Q-values in dictionary of dictionaries
         for x in range(environment.height): # Loop through all possible grid spaces, create sub-dictionary for each
             for y in range(environment.width):
-                self.q_table[(x,y)] = {'UP':0, 'DOWN':0, 'LEFT':0, 'RIGHT':0} # Populate sub-dictionary with zero values for possible moves
+                self.q_table[(x,y)] = {'UP':0, 'DOWN':0, 'LEFT':0, 'RIGHT':0, 'STAY':0} # Populate sub-dictionary with zero values for possible moves
 
         self.epsilon = epsilon
         self.alpha = alpha
