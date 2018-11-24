@@ -130,14 +130,6 @@ def simulate(policy, T):
         pos_player = player_path[-1]
 
         #Moving the player
-        print(pos_player[1])
-        print(pos_player[0])
-        print(pos_min[1])
-        print(pos_min[0])
-        print(policy)
-        print(ACTIONS[policy[pos_player[1]][pos_player[0]][pos_min[1]][pos_min[0]]])
-
-
         new_pos_player = pos_player + ACTIONS[policy[pos_player[1]][pos_player[0]][pos_min[1]][pos_min[0]]]
 
         player_path.append(new_pos_player)
@@ -157,10 +149,10 @@ def simulate(policy, T):
 
 if __name__ == '__main__':
 
-    #policy = np.zeros((WORLD_Y, WORLD_X, WORLD_Y, WORLD_X), dtype=int)
-    #policy.fill(4)
+    policy = np.zeros((WORLD_Y, WORLD_X, WORLD_Y, WORLD_X), dtype=int)
+    policy.fill(4)
 
-    policy = value_iteration()
+    #policy = value_iteration()
 
     win_counter = 0
 

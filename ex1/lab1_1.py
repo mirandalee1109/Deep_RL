@@ -232,6 +232,7 @@ def value_iteration():
                 policy.append(act_returns[np.argmax(action_returns)])
                 #policy(m, n, x, y)= policy[m*WORLD_Y+n*WORLD_X+x*WORLD_X + y]
 
+    #For using at the simulation
     return policy
 
 if __name__ == '__main__':
