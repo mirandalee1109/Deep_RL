@@ -8,7 +8,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.table import Table
 
-T = 5
+T = 15
 
 WORLD_Y, WORLD_X = 5, 6
 # left,up,right,down,stay
@@ -176,14 +176,15 @@ def value_iteration():
                         #policy[x][y][m][n] = index(act_returns[np.argmax(action_returns)])
                         state_value[x][y][m][n] = new_value
 
-        if np.sum(np.square(state_value - value)) < 1e-4:
+        #DELETE False later
+        if False and np.sum(np.square(state_value - value)) < 1e-4:
             #value = state_value.copy()
             break
         else:
             value = state_value.copy()
             t += 1
 
-    print(t)
+    #print(t)
 
 
  # compute the optimal policy
@@ -199,6 +200,7 @@ def value_iteration():
                             #or (m == next_x and n == next_y):
                         # minotaur not in the (x,y) and (next_x, next_y)
                             continue
+
                         action_returns = []
                         act_returns = []
                         for action in ACTIONS:
@@ -229,6 +231,8 @@ def value_iteration():
 
                 policy.append(act_returns[np.argmax(action_returns)])
                 #policy(m, n, x, y)= policy[m*WORLD_Y+n*WORLD_X+x*WORLD_X + y]
+
+    return policy
 
 if __name__ == '__main__':
     value_iteration()

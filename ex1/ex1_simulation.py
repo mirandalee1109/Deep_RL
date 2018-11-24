@@ -7,8 +7,10 @@ from matplotlib.table import Table
 from matplotlib import collections  as mc
 import random
 
-SIZE_X=6
-SIZE_Y=5
+from lab1_1 import value_iteration
+
+WORLD_X=6
+WORLD_Y=5
 
 T=15
 
@@ -18,61 +20,57 @@ ACTIONS = [np.array([0, -1]),
            np.array([1, 0]),
            np.array([0, 0])]
 
+#Moving the minotaur randomly
 def min_move(position):
-
     moves = []
     if position[0] > 0:
         moves.append(np.array([-1, 0]))
 
-    if position[0] < SIZE_X -1:
+    if position[0] < WORLD_X -1:
         moves.append(np.array([1, 0]))
 
     if position[1] > 0:
         moves.append(np.array([0, -1]))
 
-    if position[1] < SIZE_Y -1:
+    if position[1] < WORLD_Y -1:
         moves.append(np.array([0, 1]))
 
     return position + random.choice(moves)
 
 
-
-
+#For plotting the example execution
 def draw_image(player_path, min_path):
     fig, ax = plt.subplots()
     ax.set_axis_off()
     tb = Table(ax, bbox=[0, 0, 1, 1])
 
-    ncols = SIZE_X
-    nrows = SIZE_Y
+    ncols = WORLD_X
+    nrows = WORLD_Y
 
     width, height = 1.0 / ncols, 1.0 / nrows
 
     # Add cells
-    for i in range(SIZE_Y):
-        for j in range(SIZE_X):
-            # Index either the first or second item of bkg_colors based on
-            # a checker board pattern
-            idx = [j % 2, (j + 1) % 2][i % 2]
+    for i in range(WORLD_Y):
+        for j in range(WORLD_X):
             color = 'white'
 
+            #Finish
             if i==4 and j==4:
                 tb.add_cell(i, j, width, height,
                             loc='center', edgecolor='#63b1f2', facecolor='#9bb4db')
-
+            #Start
             elif i==0 and j==0:
                 tb.add_cell(i, j, width, height,
                             loc='center', edgecolor='#63b1f2', facecolor='#9fe592')
-
             else:
                 tb.add_cell(i, j, width, height,
                             loc='center', edgecolor='#63b1f2', facecolor=color)
     # Row Labels...
-    for i, label in enumerate(range(SIZE_Y)):
+    for i, label in enumerate(range(WORLD_Y)):
         tb.add_cell(i, -1, width, height, text=label+1, loc='right',
                     edgecolor='none', facecolor='none')
     # Column Labels...
-    for j, label in enumerate(range(SIZE_X)):
+    for j, label in enumerate(range(WORLD_X)):
         tb.add_cell(-1, j, width, height/2, text=label+1, loc='center',
                            edgecolor='none', facecolor='none')
     ax.add_table(tb)
@@ -112,28 +110,45 @@ def draw_image(player_path, min_path):
 
     ax.add_collection(lc)
 
-    plt.savefig('./figure_4_1.png')
+    plt.savefig('./example.png')
     plt.close()
 
 
-def simulate(values, T):
-
+#Simulating with maximum time T and action grid given
+def simulate(policy, T):
+    #Starting positions
     min_path=[[4,4]]
     player_path = [[0,0]]
 
+    #Checking if we have won or not
     win = False
 
+
     for t in range(T):
+        #Where each one is
         pos_min = min_path[-1]
         pos_player = player_path[-1]
 
-        new_pos_player = pos_player + ACTIONS[values[pos_player[1]][pos_player[0]][pos_min[1]][pos_min[0]]]
+        #Moving the player
+        print(pos_player[1])
+        print(pos_player[0])
+        print(pos_min[1])
+        print(pos_min[0])
+        print(policy)
+        print(ACTIONS[policy[pos_player[1]][pos_player[0]][pos_min[1]][pos_min[0]]])
+
+
+        new_pos_player = pos_player + ACTIONS[policy[pos_player[1]][pos_player[0]][pos_min[1]][pos_min[0]]]
 
         player_path.append(new_pos_player)
         min_path.append(min_move(pos_min))
 
+        #If won
         if new_pos_player[0] == 4 and new_pos_player[1] == 4:
             win = True
+            break
+        #If eaten by minotaur
+        elif new_pos_player[0] == min_path[-1][0] and new_pos_player[1] == min_path[-1][1]:
             break
 
 
@@ -142,18 +157,19 @@ def simulate(values, T):
 
 if __name__ == '__main__':
 
-    #REPLACE THIS WITH REAL VALUES
-    values = np.zeros((SIZE_Y, SIZE_X, SIZE_Y, SIZE_X), dtype=int)
-    values.fill(4)
+    #policy = np.zeros((WORLD_Y, WORLD_X, WORLD_Y, WORLD_X), dtype=int)
+    #policy.fill(4)
+
+    policy = value_iteration()
 
     win_counter = 0
 
     #Example for drawing
-    player_path, min_path, _ = simulate(values)
+    player_path, min_path, _ = simulate(policy, T)
 
     total_simulations = 10000
     for i in range(total_simulations):
-        _, _, win = simulate(values)
+        _, _, win = simulate(policy, T)
 
         if win:
             win_counter += 1
