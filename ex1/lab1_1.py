@@ -103,15 +103,15 @@ def minotaur_step(state, action):
 
 def index(argument):
 
-    if argument[0] == np.array([0, -1]):
+    if argument[0] == 0 and argument[1] == -1:
         return 0
-    if argument[0] == np.array([-1, 0]):
+    if argument[0] == -1 and argument[1] == 0:
         return 1
-    if argument[0] == np.array([0, 1]):
+    if argument[0] == 0 and argument[1] == 1:
         return 2
-    if argument[0] == np.array([1, 0]):
+    if argument[0] == 1 and argument[1] == 0:
         return 3
-    if argument[0] == np.array([0, 0]):
+    if argument[0] == 0 and argument[1] == 0:
         return 4
 
     return -1
@@ -175,6 +175,9 @@ def value_iteration():
                         new_value = np.max(action_returns)
                         #policy[x][y][m][n] = index(act_returns[np.argmax(action_returns)])
                         state_value[x][y][m][n] = new_value
+                        argument = act_returns[np.argmax(action_returns)]
+                        policy[m][n][x][y] = index(argument)
+                        # print(policy[m][n][x][y])
 
         #DELETE False later
         if False and np.sum(np.square(state_value - value)) < 1e-4:
@@ -186,9 +189,7 @@ def value_iteration():
 
     #print(t)
 
-
- # compute the optimal policy
-    policy = []
+'''
     for m in range(0, WORLD_Y):
         for n in range(0, WORLD_X):
             # all possible positions of minotaur
@@ -228,11 +229,11 @@ def value_iteration():
                             action_returns.append(np.sum(action_value))
                             act_returns.append(action)
 
-            policy.append(act_returns[np.argmax(action_returns)])
+
             #policy(m, n, x, y)= policy[m*WORLD_Y+n*WORLD_X+x*WORLD_X + y]
 
     #For using at the simulation
     return policy
-
+'''
 if __name__ == '__main__':
     value_iteration()
