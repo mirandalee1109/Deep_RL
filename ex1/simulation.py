@@ -162,7 +162,7 @@ if __name__ == '__main__':
     player_path, min_path, _ = simulate(policy, T)
 
     draw_image(player_path, min_path)
-
+ 
     #Simulations
     total_simulations = 10000
     for i in range(total_simulations):
