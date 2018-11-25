@@ -7,7 +7,7 @@ from matplotlib.table import Table
 from matplotlib import collections  as mc
 import random
 
-from lab1_1 import value_iteration
+from calculation import value_iteration
 
 WORLD_X=6
 WORLD_Y=5
@@ -167,6 +167,7 @@ def simulate(policy, T):
         #If eaten by minotaur
         elif new_pos_player[0] == min_path[-1][0] and new_pos_player[1] == min_path[-1][1]:
             break
+
 
     return player_path, min_path, win
 
