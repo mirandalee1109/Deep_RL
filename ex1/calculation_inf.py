@@ -21,8 +21,7 @@ ACTIONS_MIN = [np.array([0, -1]),
                np.array([0, 1]),
                np.array([1, 0])]
 
-ACTION_PROB = 0.2
-
+LAMBDA = 1/30
 
 def step(state, action):
     x_, y_ = state
@@ -75,7 +74,7 @@ def index(argument):
 
     return -1
 
-def value_iteration(T):
+def value_iteration_inf():
     # state value
     #reward = np.full((WORLD_Y, WORLD_X), 0)
     reward_win = 1 # win
@@ -87,9 +86,8 @@ def value_iteration(T):
     # value iteration
     #a = Reward_calculate()
     iteration = 0
-    t = 0
 
-    while t < T:
+    while True:
         new_state_value = np.copy(state_value)
         for m in range(0, WORLD_Y):
             for n in range(0, WORLD_X):
@@ -126,7 +124,7 @@ def value_iteration(T):
                                         else:
                                             action_value.append(np.round(prob_state * (state_value[next_x, next_y, next_m, next_n]), 4))
 
-                                action_returns.append(np.sum(action_value))
+                                action_returns.append(LAMBDA*np.sum(action_value))
                                 act_returns.append(action)
 
 
@@ -140,16 +138,13 @@ def value_iteration(T):
 
         state_value = new_state_value
         if np.sum(np.square(state_value - value)) < 1e-4:
-            #value = state_value.copy()
             break
         else:
             value = state_value.copy()
-            t += 1
 
-    #print(t)
 
     return policy
 
 
 if __name__ == '__main__':
-    value_iteration(15)
+    value_iteration_inf()

@@ -9,6 +9,7 @@ import random
 import os
 
 from calculation import value_iteration
+from calculation_inf import value_iteration_inf
 
 WORLD_X=6
 WORLD_Y=5
@@ -41,7 +42,7 @@ def min_move(position):
 
 
 #For plotting the example execution
-def draw_image(player_path, min_path):
+def draw_image(player_path, min_path, name):
     fig, ax = plt.subplots()
     ax.set_axis_off()
     tb = Table(ax, bbox=[0, 0, 1, 1])
@@ -112,7 +113,7 @@ def draw_image(player_path, min_path):
 
     ax.add_collection(lc)
 
-    plt.savefig('./example.png')
+    plt.savefig(name)
     plt.close()
 
 
@@ -149,6 +150,39 @@ def simulate(policy, T):
     return player_path, min_path, win
 
 
+#Simulating with maximum time T and action grid given
+def simulate_inf(policy):
+    #Starting positions
+    min_path=[[4,4]]
+    player_path = [[0,0]]
+
+    #Checking if we have won or not
+    win = False
+
+
+    while True:
+        #Where each one is
+        pos_min = min_path[-1]
+        pos_player = player_path[-1]
+
+        #Moving the player
+        new_pos_player = pos_player + ACTIONS[policy[pos_player[0]][pos_player[1]][pos_min[0]][pos_min[1]]]
+
+        player_path.append(new_pos_player)
+        min_path.append(min_move(pos_min))
+
+        #If won
+        if new_pos_player[0] == 4 and new_pos_player[1] == 4:
+            win = True
+            break
+        #If eaten by minotaur
+        elif new_pos_player[0] == min_path[-1][0] and new_pos_player[1] == min_path[-1][1]:
+            break
+
+
+    return player_path, min_path, win
+
+
 if __name__ == '__main__':
 
 
@@ -158,17 +192,17 @@ if __name__ == '__main__':
 
     player_path, min_path, _ = simulate(policy, 15)
 
-    draw_image(player_path, min_path)
+    draw_image(player_path, min_path,'./example.png')
 
 
     time = []
     wins = []
 
-
+    '''
     #Simulations
     for t in range(10,40):
         win_counter = 0
-        total_simulations = 100000
+        total_simulations = 10000
         policy = value_iteration(t)
 
         for i in range(total_simulations):
@@ -182,12 +216,35 @@ if __name__ == '__main__':
         print("Out of:" + str(total_simulations))
         print("-------------------------")
         time.append(t)
-        wins.append(float(win_counter)/(total_simulations*100))
+        wins.append(float(win_counter)/(total_simulations/100))
 
     plt.plot(np.asarray(time),np.asarray(wins))
     plt.xlabel("T")
     plt.ylabel("Win %")
     plt.savefig('./graph.png')
     plt.close()
+
+    '''
+
+    #For 1_c
+    policy_inf = value_iteration_inf()
+
+    player_path, min_path, _ = simulate_inf(policy_inf)
+
+    draw_image(player_path, min_path,'./example_inf.png')
+
+
+    win_counter = 0
+    total_simulations = 10000
+
+    for i in range(total_simulations):
+        _, _, win = simulate_inf(policy_inf)
+
+        if win:
+            win_counter += 1
+
+
+    print("Total wins:" + str(win_counter))
+    print("Out of:" + str(total_simulations))
 
     print("Done")
