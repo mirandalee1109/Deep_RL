@@ -136,7 +136,7 @@ def value_iteration():
                         #policy[x][y][m][n] = index(act_returns[np.argmax(action_returns)])
                         new_state_value[x][y][m][n] = new_value
                         argument = act_returns[np.argmax(action_returns)]
-                        policy[m][n][x][y] = index(argument)
+                        policy[x][y][m][n] = index(argument)
                         # print(policy[m][n][x][y])
 
 
@@ -149,9 +149,7 @@ def value_iteration():
             t += 1
 
     #print(t)
-    for i in range(5):
-        print(str(policy[i][0][4][4]) + "," + str(policy[i][1][4][4]) + "," + str(policy[i][2][4][4]) + "," + str(policy[i][4][4][3]) + "," + str(policy[i][4][4][4]) + "," + str(policy[i][5][4][4]))
-
+    
     return policy
 
 

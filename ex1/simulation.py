@@ -131,10 +131,6 @@ def simulate(policy, T):
         pos_min = min_path[-1]
         pos_player = player_path[-1]
 
-        print("--------------")
-        print(pos_player)
-        print(ACTIONS[policy[pos_player[0]][pos_player[1]][pos_min[0]][pos_min[1]]])
-
         #Moving the player
         new_pos_player = pos_player + ACTIONS[policy[pos_player[0]][pos_player[1]][pos_min[0]][pos_min[1]]]
 
@@ -165,7 +161,6 @@ if __name__ == '__main__':
     #Example for drawing
     player_path, min_path, _ = simulate(policy, T)
 
-    print("end")
     draw_image(player_path, min_path)
 
     #Simulations
