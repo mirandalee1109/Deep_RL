@@ -133,6 +133,7 @@ def simulate(policy, T):
 
         print("--------------")
         print(pos_player)
+        print(ACTIONS[policy[pos_player[0]][pos_player[1]][pos_min[0]][pos_min[1]]])
 
         #Moving the player
         new_pos_player = pos_player + ACTIONS[policy[pos_player[0]][pos_player[1]][pos_min[0]][pos_min[1]]]

@@ -80,8 +80,8 @@ def index(argument):
 def value_iteration():
     # state value
     #reward = np.full((WORLD_Y, WORLD_X), 0)
-    reward_win = 0.01 # win
-    reward_death = -0.01 # death
+    reward_win = 1 # win
+    reward_death = -1 # death
 
     state_value = np.zeros((WORLD_Y, WORLD_X, WORLD_Y, WORLD_X))# me position & minotaur position
     policy = np.full((WORLD_Y, WORLD_X, WORLD_Y, WORLD_X), -1)
@@ -132,6 +132,7 @@ def value_iteration():
 
 
                         new_value = np.max(action_returns)
+                        print(new_value)
                         #policy[x][y][m][n] = index(act_returns[np.argmax(action_returns)])
                         state_value[x][y][m][n] = new_value
                         argument = act_returns[np.argmax(action_returns)]
