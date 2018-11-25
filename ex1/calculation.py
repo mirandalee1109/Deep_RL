@@ -92,6 +92,7 @@ def value_iteration():
     t = 0
 
     while t < T:
+        new_state_value = np.copy(state_value)
         for m in range(0, WORLD_Y):
             for n in range(0, WORLD_X):
                 # all possible positions of minotaur
@@ -132,13 +133,14 @@ def value_iteration():
 
 
                         new_value = np.max(action_returns)
-                        print(new_value)
                         #policy[x][y][m][n] = index(act_returns[np.argmax(action_returns)])
-                        state_value[x][y][m][n] = new_value
+                        new_state_value[x][y][m][n] = new_value
                         argument = act_returns[np.argmax(action_returns)]
                         policy[m][n][x][y] = index(argument)
                         # print(policy[m][n][x][y])
 
+
+        state_value = new_state_value
         if np.sum(np.square(state_value - value)) < 1e-4:
             #value = state_value.copy()
             break
@@ -147,6 +149,8 @@ def value_iteration():
             t += 1
 
     #print(t)
+    for i in range(5):
+        print(str(policy[i][0][4][4]) + "," + str(policy[i][1][4][4]) + "," + str(policy[i][2][4][4]) + "," + str(policy[i][4][4][3]) + "," + str(policy[i][4][4][4]) + "," + str(policy[i][5][4][4]))
 
     return policy
 

@@ -165,6 +165,7 @@ if __name__ == '__main__':
     #Example for drawing
     player_path, min_path, _ = simulate(policy, T)
 
+    print("end")
     draw_image(player_path, min_path)
 
     #Simulations
