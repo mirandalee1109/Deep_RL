@@ -99,9 +99,9 @@ def value_iteration():
                     for y in range(0, WORLD_X):
                         # each position of me
                         if (m == x and n == y):
-                            #or (m == next_x and n == next_y):
                         # minotaur not in the (x,y) and (next_x, next_y)
                             continue
+
                         action_returns = []
                         act_returns = []
                         for action in ACTIONS:
