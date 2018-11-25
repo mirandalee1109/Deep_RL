@@ -8,8 +8,6 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.table import Table
 
-T = 15
-
 WORLD_Y, WORLD_X = 5, 6
 # left,up,right,down,stay
 ACTIONS = [np.array([0, -1]),
@@ -77,7 +75,7 @@ def index(argument):
 
     return -1
 
-def value_iteration():
+def value_iteration(T):
     # state value
     #reward = np.full((WORLD_Y, WORLD_X), 0)
     reward_win = 1 # win
@@ -149,9 +147,9 @@ def value_iteration():
             t += 1
 
     #print(t)
-    
+
     return policy
 
 
 if __name__ == '__main__':
-    value_iteration()
+    value_iteration(15)

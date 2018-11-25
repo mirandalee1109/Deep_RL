@@ -150,29 +150,41 @@ def simulate(policy, T):
 
 
 if __name__ == '__main__':
-    #Deleting previous file
-    if os.path.exists("example.png"):
-        os.remove("example.png")
 
-    policy = value_iteration()
-
-    win_counter = 0
 
     #Example for drawing
-    player_path, min_path, _ = simulate(policy, T)
+    policy = value_iteration(15)
+
+
+    player_path, min_path, _ = simulate(policy, 15)
 
     draw_image(player_path, min_path)
- 
+
+
+    time = []
+    wins = []
+
     #Simulations
-    total_simulations = 10000
-    for i in range(total_simulations):
-        _, _, win = simulate(policy, T)
+    for t in range(10,40):
+        win_counter = 0
+        total_simulations = 100000
+        policy = value_iteration(t)
 
-        if win:
-            win_counter += 1
+        for i in range(total_simulations):
+            _, _, win = simulate(policy, t)
 
+            if win:
+                win_counter += 1
 
-    print("Total wins:" + str(win_counter))
-    print("Out of:" + str(total_simulations))
+        print("T:" + str(t))
+        print("Total wins:" + str(win_counter))
+        print("Out of:" + str(total_simulations))
+        print("-------------------------")
+        time.append(t)
+        wins.append(float(win_counter)/total_simulations)
+
+    plt.plot(np.asarray(time),np.asarray(wins))
+    plt.savefig('./graph.png')
+    plt.close()
 
     print("Done")
