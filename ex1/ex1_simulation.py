@@ -26,16 +26,41 @@ def min_move(position):
     if position[0] > 0:
         moves.append(np.array([-1, 0]))
 
-    if position[0] < WORLD_X -1:
+    if position[0] < WORLD_Y -1:
         moves.append(np.array([1, 0]))
 
     if position[1] > 0:
         moves.append(np.array([0, -1]))
 
-    if position[1] < WORLD_Y -1:
+    if position[1] < WORLD_X -1:
         moves.append(np.array([0, 1]))
 
     return position + random.choice(moves)
+
+def move_player(state, action):
+    x_, y_ = state
+    state = np.array(state)
+    next_state = (state + action).tolist()
+    x, y = next_state
+    if x < 0 or x >= WORLD_Y or y < 0 or y >= WORLD_X:# out of boundary
+        next_state = state.tolist()
+    if 0 <= x <= 2:
+        if (y_== 1 and y == 2) or (y_ == 2 and y == 1):
+            next_state = state.tolist()
+        if 1 <= x <= 2:
+            if (y_== 3 and y == 4) or (y_ == 4 and y == 3):
+                next_state = state.tolist()
+    if 4 <= y <= 5:
+        if (x_== 1 and x == 2) or (x_ == 2 and x == 1):
+            next_state = state.tolist()
+    if 1 <= y <= 4:
+        if (x_== 3 and x == 4) or (x_ == 4 and x == 3):
+            next_state = state.tolist()
+    if x == 4:
+        if (y_ == 3 and y == 4) or (y_ == 4 and y == 3):
+            next_state = state.tolist()
+
+    return next_state
 
 
 #For plotting the example execution
@@ -89,22 +114,22 @@ def draw_image(player_path, min_path):
 
     #Paths
     #May need improvements
-    last = ((player_path[0][0] + 0.5)/6,(4.5-player_path[0][1])/5)
+    last = ((player_path[0][1] + 0.5)/6,(4.5-player_path[0][0])/5)
     path=[]
     for k in range(len(player_path)):
-        path.append([last,((player_path[k][0] + 0.5)/6,(4.5-player_path[k][1])/5)])
-        last = ((player_path[k][0] + 0.5)/6,(4.5-player_path[k][1])/5)
+        path.append([last,((player_path[k][1] + 0.5)/6,(4.5-player_path[k][0])/5)])
+        last = ((player_path[k][1] + 0.5)/6,(4.5-player_path[k][0])/5)
 
     lc = mc.LineCollection(path, colors='r', linewidths=2)
 
     ax.add_collection(lc)
 
 
-    last = ((min_path[0][0] + 0.35)/6,(4.65-min_path[0][1])/5)
+    last = ((min_path[0][1] + 0.35)/6,(4.65-min_path[0][0])/5)
     path=[]
     for k in range(len(min_path)):
-        path.append([last,((min_path[k][0] + 0.35)/6,(4.65-min_path[k][1])/5)])
-        last = ((min_path[k][0] + 0.35)/6,(4.65-min_path[k][1])/5)
+        path.append([last,((min_path[k][1] + 0.35)/6,(4.65-min_path[k][0])/5)])
+        last = ((min_path[k][1] + 0.35)/6,(4.65-min_path[k][0])/5)
 
     lc = mc.LineCollection(path, colors='b', linewidths=2)
 
@@ -130,12 +155,7 @@ def simulate(policy, T):
         pos_player = player_path[-1]
 
         #Moving the player
-        #print(policy[pos_player[1]][pos_player[0]][pos_min[1]][pos_min[0]])
-        print(pos_player[1])
-        print(pos_player[0])
-        print(pos_min[1])
-        print(pos_min[0])
-        new_pos_player = pos_player + ACTIONS[policy[pos_player[1]][pos_player[0]][pos_min[1]][pos_min[0]]]
+        new_pos_player = move_player(pos_player,ACTIONS[policy[pos_player[0]][pos_player[1]][pos_min[0]][pos_min[1]]])
 
         player_path.append(new_pos_player)
         min_path.append(min_move(pos_min))
@@ -147,7 +167,6 @@ def simulate(policy, T):
         #If eaten by minotaur
         elif new_pos_player[0] == min_path[-1][0] and new_pos_player[1] == min_path[-1][1]:
             break
-
 
     return player_path, min_path, win
 

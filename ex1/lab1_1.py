@@ -188,6 +188,7 @@ def value_iteration():
             t += 1
 
     #print(t)
+    return policy
 
 '''
     for m in range(0, WORLD_Y):
