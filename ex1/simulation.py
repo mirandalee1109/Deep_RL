@@ -164,6 +164,7 @@ if __name__ == '__main__':
     time = []
     wins = []
 
+
     #Simulations
     for t in range(10,40):
         win_counter = 0
@@ -181,10 +182,12 @@ if __name__ == '__main__':
         print("Out of:" + str(total_simulations))
         print("-------------------------")
         time.append(t)
-        wins.append(float(win_counter)/total_simulations)
+        wins.append(float(win_counter)/(total_simulations*100))
 
     plt.plot(np.asarray(time),np.asarray(wins))
+    plt.xlabel("T")
+    plt.ylabel("Win %")
     plt.savefig('./graph.png')
     plt.close()
-
+    
     print("Done")
