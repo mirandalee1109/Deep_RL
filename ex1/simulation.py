@@ -189,5 +189,5 @@ if __name__ == '__main__':
     plt.ylabel("Win %")
     plt.savefig('./graph.png')
     plt.close()
-    
+
     print("Done")
