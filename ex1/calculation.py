@@ -91,7 +91,7 @@ def value_iteration():
     iteration = 0
     t = 0
 
-    while t <= T:
+    while t < T:
         for m in range(0, WORLD_Y):
             for n in range(0, WORLD_X):
                 # all possible positions of minotaur
@@ -121,11 +121,11 @@ def value_iteration():
                                     (next_m, next_n) = minotaur_step([m, n], act)
                                     if (next_m != m or next_n != n):
                                         if (next_m == next_x) and (next_n == next_y): # end up in the same cell
-                                            action_value.append(np.round(prob_state * (reward_death + state_value[next_x, next_y]), 4))
+                                            action_value.append(np.round(prob_state * (reward_death + state_value[next_x, next_y, next_m, next_n]), 4))
                                         elif next_x == 4 and next_y == 4:# win
-                                            action_value.append(np.round(prob_state * (reward_win + state_value[next_x, next_y]), 4))
+                                            action_value.append(np.round(prob_state * (reward_win + state_value[next_x, next_y, next_m, next_n]), 4))
                                         else:
-                                            action_value.append(np.round(prob_state * (state_value[next_x, next_y]), 4))
+                                            action_value.append(np.round(prob_state * (state_value[next_x, next_y, next_m, next_n]), 4))
 
                                 action_returns.append(np.sum(action_value))
                                 act_returns.append(action)
@@ -138,8 +138,7 @@ def value_iteration():
                         policy[m][n][x][y] = index(argument)
                         # print(policy[m][n][x][y])
 
-        #DELETE False later
-        if False and np.sum(np.square(state_value - value)) < 1e-4:
+        if np.sum(np.square(state_value - value)) < 1e-4:
             #value = state_value.copy()
             break
         else:
@@ -147,6 +146,7 @@ def value_iteration():
             t += 1
 
     #print(t)
+
     return policy
 
 

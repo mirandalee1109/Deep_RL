@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.table import Table
 from matplotlib import collections  as mc
 import random
+import os
 
 from calculation import value_iteration
 
@@ -130,6 +131,9 @@ def simulate(policy, T):
         pos_min = min_path[-1]
         pos_player = player_path[-1]
 
+        print("--------------")
+        print(pos_player)
+
         #Moving the player
         new_pos_player = pos_player + ACTIONS[policy[pos_player[0]][pos_player[1]][pos_min[0]][pos_min[1]]]
 
@@ -149,9 +153,9 @@ def simulate(policy, T):
 
 
 if __name__ == '__main__':
-
-    #policy = np.zeros((WORLD_Y, WORLD_X, WORLD_Y, WORLD_X), dtype=int)
-    #policy.fill(4)
+    #Deleting previous file
+    if os.path.exists("example.png"):
+        os.remove("example.png")
 
     policy = value_iteration()
 
