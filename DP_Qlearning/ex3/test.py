@@ -107,7 +107,7 @@ class GridWorld:
         self.move_police()
 
         if self.police_location[0] == self.current_location[0] and self.police_location[1] == self.current_location[1]:
-            reward = self.police_reward = -10
+            reward = self.police_reward
             self.current_location = (0,0)
             self.police_location = (3,3)
 
@@ -156,29 +156,25 @@ class Q_Agent():
 
 
 
-def play(environment, agent, trials=500, max_steps_per_episode=1000, learn=False):
+def play(environment, agent, trials=10000000, max_steps_per_episode=1000):
     """The play function runs iterations and updates Q-values if desired."""
     reward_per_episode = [] # Initialise performance log
 
     for trial in range(trials): # Run trials
+        print(trial)
         cumulative_reward = 0 # Initialise values of each game
         step = 0
-        game_over = False
-        while step < max_steps_per_episode and game_over != True: # Run until max steps or until game is finished
+        while step < max_steps_per_episode: # Run until max steps or until game is finished
             old_state = environment.current_location
             action = agent.choose_action(environment.actions)
             reward = environment.make_step(action)
             new_state = environment.current_location
 
-            if learn == True: # Update Q-values if learning is specified
-                agent.learn(old_state, reward, new_state, action)
+
+            agent.learn(old_state, reward, new_state, action)
 
             cumulative_reward += reward
             step += 1
-
-            if environment.check_state() == 'TERMINAL': # If game is in terminal state, game over and start next trial
-                environment.__init__()
-                game_over = True
 
         reward_per_episode.append(cumulative_reward) # Append reward for current trial to performance log
 
@@ -191,7 +187,7 @@ environment = GridWorld()
 agentQ = Q_Agent(environment)
 
 # Note the learn=True argument!
-reward_per_episode = play(environment, agentQ, trials=500, learn=True)
+reward_per_episode = play(environment, agentQ)
 
 # Simple learning curve
 plt.plot(reward_per_episode)
