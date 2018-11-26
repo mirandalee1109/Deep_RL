@@ -199,7 +199,7 @@ if __name__ == '__main__':
     time = []
     wins = []
 
-
+    
     #Simulations
     for t in range(10,40):
         win_counter = 0
