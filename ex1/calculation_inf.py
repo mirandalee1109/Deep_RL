@@ -1,7 +1,5 @@
 
 # author@litingyi
-
-
 import numpy as np
 import matplotlib
 matplotlib.use('Agg')
@@ -88,7 +86,7 @@ def value_iteration_inf():
     iteration = 0
 
     while True:
-        new_state_value = np.copy(state_value)
+        #new_state_value = np.copy(state_value)
         for m in range(0, WORLD_Y):
             for n in range(0, WORLD_X):
                 # all possible positions of minotaur
@@ -118,11 +116,11 @@ def value_iteration_inf():
                                     (next_m, next_n) = minotaur_step([m, n], act)
                                     if (next_m != m or next_n != n):
                                         if (next_m == next_x) and (next_n == next_y): # end up in the same cell
-                                            action_value.append(np.round(prob_state * (reward_death + state_value[next_x, next_y, next_m, next_n]), 4))
+                                            action_value.append(np.round(prob_state * (reward_death + LAMBDA * state_value[next_x, next_y, next_m, next_n]), 4))
                                         elif next_x == 4 and next_y == 4:# win
-                                            action_value.append(np.round(prob_state * (reward_win + state_value[next_x, next_y, next_m, next_n]), 4))
+                                            action_value.append(np.round(prob_state * (reward_win + LAMBDA * state_value[next_x, next_y, next_m, next_n]), 4))
                                         else:
-                                            action_value.append(np.round(prob_state * (state_value[next_x, next_y, next_m, next_n]), 4))
+                                            action_value.append(np.round(prob_state * (LAMBDA * state_value[next_x, next_y, next_m, next_n]), 4))
 
                                 action_returns.append(LAMBDA*np.sum(action_value))
                                 act_returns.append(action)
@@ -130,21 +128,21 @@ def value_iteration_inf():
 
                         new_value = np.max(action_returns)
                         #policy[x][y][m][n] = index(act_returns[np.argmax(action_returns)])
-                        new_state_value[x][y][m][n] = new_value
+                        state_value[x][y][m][n] = new_value
                         argument = act_returns[np.argmax(action_returns)]
                         policy[x][y][m][n] = index(argument)
                         # print(policy[m][n][x][y])
 
-
-        state_value = new_state_value
-        if np.sum(np.square(state_value - value)) < 1e-4:
+        #state_value = new_state_value
+        if np.sum(np.square(state_value - value)) < 1e-200:
             break
         else:
             value = state_value.copy()
-
+            iteration += 1
 
     return policy
 
 
 if __name__ == '__main__':
-    value_iteration_inf()
+    f, time = value_iteration_inf()
+    print(time)

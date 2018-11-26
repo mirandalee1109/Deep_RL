@@ -150,7 +150,7 @@ def simulate(policy, T):
     return player_path, min_path, win
 
 
-#Simulating with maximum time T and action grid given
+#Simulating with inf time and action grid given
 def simulate_inf(policy):
     #Starting positions
     min_path=[[4,4]]
@@ -187,18 +187,19 @@ if __name__ == '__main__':
 
 
     #Example for drawing
+    #policy = value_iteration_inf()
     policy = value_iteration(15)
-
-
+    #
+    #
     player_path, min_path, _ = simulate(policy, 15)
-
+    #
     draw_image(player_path, min_path,'./example.png')
-
-
+    #
+    #
     time = []
     wins = []
 
-    '''
+
     #Simulations
     for t in range(10,40):
         win_counter = 0
@@ -224,14 +225,17 @@ if __name__ == '__main__':
     plt.savefig('./graph.png')
     plt.close()
 
-    '''
+
 
     #For 1_c
+    print("start!")
     policy_inf = value_iteration_inf()
+    print("policy Done!")
 
     player_path, min_path, _ = simulate_inf(policy_inf)
+    print("simulate done!")
 
-    draw_image(player_path, min_path,'./example_inf.png')
+    #draw_image(player_path, min_path,'./example_inf.png')
 
 
     win_counter = 0
