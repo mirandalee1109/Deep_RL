@@ -86,7 +86,7 @@ def value_iteration_inf():
     iteration = 0
 
     while True:
-        #new_state_value = np.copy(state_value)
+        new_state_value = np.copy(state_value)
         for m in range(0, WORLD_Y):
             for n in range(0, WORLD_X):
                 # all possible positions of minotaur
@@ -94,7 +94,7 @@ def value_iteration_inf():
                     for y in range(0, WORLD_X):
                         # each position of me
                         if (m == x and n == y):
-                        # minotaur not in the (x,y) and (next_x, next_y)
+                        # minotaur not in the (x,y)
                             continue
 
                         action_returns = []
@@ -127,13 +127,11 @@ def value_iteration_inf():
 
 
                         new_value = np.max(action_returns)
-                        #policy[x][y][m][n] = index(act_returns[np.argmax(action_returns)])
-                        state_value[x][y][m][n] = new_value
+                        new_state_value[x][y][m][n] = new_value
                         argument = act_returns[np.argmax(action_returns)]
                         policy[x][y][m][n] = index(argument)
-                        # print(policy[m][n][x][y])
 
-        #state_value = new_state_value
+        state_value = new_state_value
         if np.sum(np.square(state_value - value)) < 1e-200:
             break
         else:

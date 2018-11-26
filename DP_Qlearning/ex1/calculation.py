@@ -77,15 +77,13 @@ def index(argument):
 
 def value_iteration(T):
     # state value
-    #reward = np.full((WORLD_Y, WORLD_X), 0)
     reward_win = 1 # win
     reward_death = -1 # death
 
     state_value = np.zeros((WORLD_Y, WORLD_X, WORLD_Y, WORLD_X))# me position & minotaur position
     policy = np.full((WORLD_Y, WORLD_X, WORLD_Y, WORLD_X), -1)
-    value = np.zeros(state_value.shape)
+
     # value iteration
-    #a = Reward_calculate()
     iteration = 0
     t = 0
 
@@ -98,7 +96,7 @@ def value_iteration(T):
                     for y in range(0, WORLD_X):
                         # each position of me
                         if (m == x and n == y):
-                        # minotaur not in the (x,y) and (next_x, next_y)
+                        # minotaur not in the (x,y)
                             continue
 
                         action_returns = []
@@ -131,21 +129,12 @@ def value_iteration(T):
 
 
                         new_value = np.max(action_returns)
-                        #policy[x][y][m][n] = index(act_returns[np.argmax(action_returns)])
                         new_state_value[x][y][m][n] = new_value
                         argument = act_returns[np.argmax(action_returns)]
                         policy[x][y][m][n] = index(argument)
-                        # print(policy[m][n][x][y])
-
 
         state_value = new_state_value
-        if np.sum(np.square(state_value - value)) < 1e-4:
-            #value = state_value.copy()
-            #value stores last value function
-            break
-        else:
-            value = state_value.copy()
-            t += 1
+        t += 1
 
     #print(t)
 
