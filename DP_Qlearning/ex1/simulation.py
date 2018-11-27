@@ -201,7 +201,7 @@ if __name__ == '__main__':
 
 
     #Simulations
-    for t in range(10,40):
+    for t in range(0,120):
         win_counter = 0
         total_simulations = 10000
         policy = value_iteration(t)
