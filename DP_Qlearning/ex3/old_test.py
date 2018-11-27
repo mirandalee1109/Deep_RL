@@ -21,7 +21,7 @@ class GridWorld:
         self.bank_location = (1,1)
 
         # Set grid rewards for special cells
-        self.grid[ self.bank_location[0], self.bank_location[1]] = 1
+        self.grid[self.bank_location[0], self.bank_location[1]] = 1
         self.police_reward = -10
 
         # Set available actions
@@ -29,13 +29,14 @@ class GridWorld:
 
 
     ## Put methods here:
+
     def get_available_actions(self):
         """Returns possible actions"""
         return self.actions
 
     def get_reward(self, new_location):
         """Returns the reward for an input position"""
-        return self.grid[ new_location[0], new_location[1]]
+        return self.grid[new_location[0], new_location[1]]
 
     #Moving the police randomly
     def move_police(self):
@@ -56,7 +57,7 @@ class GridWorld:
         self.police_location = position + random.choice(moves)
 
 
-
+# make the Q_Agent move to a specific direction
     def make_step(self, action):
         """Moves the agent in the specified direction. If agent is at a border, agent stays still
         but takes negative reward. Function returns the reward for the move."""
@@ -113,22 +114,26 @@ class GridWorld:
 
 
         return reward
-
+'''
 class RandomAgent():
     # Choose a random action
     def choose_action(self, available_actions):
         """Returns a random choice of the available actions"""
         return np.random.choice(available_actions)
-
+'''
 
 class Q_Agent():
     # Intialise
-    def __init__(self, environment, epsilon=0.05, alpha=0.1, gamma=1):
+    def __init__(self, environment, epsilon=0.1, alpha=0.1, gamma=0.8):
         self.environment = environment
         self.q_table = dict() # Store all Q-values in dictionary of dictionaries
+        self.q_count = dict()
         for x in range(environment.height): # Loop through all possible grid spaces, create sub-dictionary for each
             for y in range(environment.width):
-                self.q_table[(x,y)] = {'UP':0, 'DOWN':0, 'LEFT':0, 'RIGHT':0, 'STAY':0} # Populate sub-dictionary with zero values for possible moves
+                self.q_table[(x,y)] = {'UP':0, 'DOWN':0, 'LEFT':0, 'RIGHT':0, 'STAY':0}
+                 # Populate sub-dictionary with zero values for possible moves
+                self.q_count[(x,y)] = {'UP':0, 'DOWN':0, 'LEFT':0, 'RIGHT':0, 'STAY':0}
+                #count n(s,a)
 
         self.epsilon = epsilon
         self.alpha = alpha
@@ -137,7 +142,7 @@ class Q_Agent():
     def choose_action(self, available_actions):
         """Returns the optimal action from Q-Value table. If multiple optimal actions, chooses random choice.
         Will make an exploratory random action dependent on epsilon."""
-        if np.random.uniform(0,1) < self.epsilon:
+        if np.random.uniform(0, 1) < self.epsilon:
             action = available_actions[np.random.randint(0, len(available_actions))]
         else:
             q_values_of_state = self.q_table[self.environment.current_location]
@@ -146,17 +151,38 @@ class Q_Agent():
 
         return action
 
-    def learn(self, old_state, reward, new_state, action):
-        """Updates the Q-value table using Q-learning"""
+    def sarsa_learn(self, old_state, reward, new_state, action, new_action):
+        """Updates the Q-value table using sarsa-learning"""
+        q_values_of_state = self.q_table[new_state]
+        max_q_value_in_new_state = self.q_table[new_state][new_action]
+        current_q_value = self.q_table[old_state][action]
+
+        n_count = self.q_count[old_state][action]
+        if (n_count!=0):
+            step_size = 1/((n_count)**(2/3))
+        else:
+            step_size = 1/(0.1**(2/3))
+
+        self.q_table[old_state][action] = (1 - step_size) * current_q_value + step_size * (reward + self.gamma * max_q_value_in_new_state)
+        self.q_count[old_state][action] += 1
+
+    def q_learn(self, old_state, reward, new_state, action):
+        """Updates the q table using q-learning"""
         q_values_of_state = self.q_table[new_state]
         max_q_value_in_new_state = max(q_values_of_state.values())
         current_q_value = self.q_table[old_state][action]
+        # update step size
+        n_count = self.q_count[old_state][action]
+        if (n_count!=0):
+            step_size = 1/((n_count)**(2/3))
+        else:
+            step_size = 1/(0.1**(2/3))
 
-        self.q_table[old_state][action] = (1 - self.alpha) * current_q_value + self.alpha * (reward + self.gamma * max_q_value_in_new_state)
+        self.q_table[old_state][action] = (1 - step_size) * current_q_value + step_size * (reward + self.gamma * max_q_value_in_new_state)
+        self.q_count[old_state][action] += 1
 
 
-
-def play(environment, agent, trials=10000000, max_steps_per_episode=1000):
+def play(environment, agent, trials=1000, max_steps_per_episode=1000):
     """The play function runs iterations and updates Q-values if desired."""
     reward_per_episode = [] # Initialise performance log
 
@@ -164,23 +190,42 @@ def play(environment, agent, trials=10000000, max_steps_per_episode=1000):
         print(trial)
         cumulative_reward = 0 # Initialise values of each game
         step = 0
+        #q learning
         while step < max_steps_per_episode: # Run until max steps or until game is finished
             old_state = environment.current_location
             action = agent.choose_action(environment.actions)
             reward = environment.make_step(action)
             new_state = environment.current_location
 
+            agent.q_learn(old_state, reward, new_state, action)
 
-            agent.learn(old_state, reward, new_state, action)
+            action = action_next
+            old_state = new_state
 
             cumulative_reward += reward
             step += 1
 
+        #sarsa learning
+        old_state = environment.current_location
+        action = agent.choose_action(environment.actions)
+        while step < max_steps_per_episode: # Run until max steps or until game is finished
+            reward = environment.make_step(action)
+            new_state = environment.current_location
+            action_next = agent.choose_action(environment.actions)
+
+
+            # agent.q_learn(old_state, reward, new_state, action)
+            agent.sarsa_learn(old_state, reward, new_state, action, action_next)
+
+            action = action_next
+            old_state = new_state
+
+            cumulative_reward += reward
+            step += 1
+        '''
         reward_per_episode.append(cumulative_reward) # Append reward for current trial to performance log
 
     return reward_per_episode # Return performance log
-
-
 
 
 environment = GridWorld()
