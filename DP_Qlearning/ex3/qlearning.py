@@ -117,7 +117,7 @@ def sarsa(q_value, steps, episode, epsi = EPSILON):
         state = next_state
         action = next_action
         police_position = next_police_position
-    return rewards
+    return np.max(q_value[0][0][3][3])
 
 # an episode with Q-Learning
 # @q_value: values for state action pair, will be updated
@@ -144,18 +144,19 @@ def q_learning(q_value, steps, episode):
                 q_value[state[0], state[1],police_position[0],police_position[1], action])
         state = next_state
         police_position = next_police_position
-    return rewards
+    return np.max(q_value[0][0][3][3])
 
 # Use multiple runs instead of a single run and a sliding window
 # With a single run I failed to present a smooth curve
 # However the optimal policy converges well with a single run
 # Sarsa converges to the safe path, while Q-Learning converges to the optimal path
 def figure_6_4():
+    '''
     # episodes
     episodes = 1000
-    steps = 10000
+    steps = 20000
 
-    '''
+
     rewards_sarsa = []
     rewards_q_learning = []
     episod = []
@@ -166,37 +167,67 @@ def figure_6_4():
         print("Episode: " + str(i))
         rewards_sarsa.append(sarsa(q_sarsa, steps, i))
         rewards_q_learning.append(q_learning(q_q_learning, steps, i))
-        episod.append(i)
+        episod.append(i*steps)
 
     # draw reward curves
     plt.plot(episod,rewards_sarsa, label='Sarsa')
     plt.plot(episod,rewards_q_learning, label='Q-Learning')
-    plt.xlabel('Episodes')
-    plt.ylabel('Sum of rewards during episode')
+    plt.xlabel('Iterations')
+    plt.ylabel('Value function')
     plt.legend()
 
     plt.savefig('./qlearning.png')
     plt.close()
-    '''
 
+    '''
     epsi = []
     mean_rew = []
 
-    for j in range(1,20):
-        print(j)
-        q_sarsa = np.zeros((WORLD_HEIGHT, WORLD_WIDTH,WORLD_HEIGHT, WORLD_WIDTH, 5))
-        rewards_sarsa = []
-        epsilon = j/20
-        for i in range(0, episodes):
-            print("Episode: " + str(i))
-            rewards_sarsa.append(sarsa(q_sarsa, steps, i, epsi))
+    list = [0.05,0.1,0.2,0.3,0.4]
+    episodes = 1000
+    steps = 10000
 
-        epsi.append(epsilon)
-        mean_rew.append(sum(rewards_sarsa) / float(len(rewards_sarsa)))
 
-    plt.plot(epsi,mean_rew)
-    plt.xlabel('Epsilon')
-    plt.ylabel('Mean reward')
+    q_sarsa1 = np.zeros((WORLD_HEIGHT, WORLD_WIDTH,WORLD_HEIGHT, WORLD_WIDTH, 5))
+    rewards_sarsa1 = []
+    epsilon1 = list[0]
+
+    q_sarsa2 = np.zeros((WORLD_HEIGHT, WORLD_WIDTH,WORLD_HEIGHT, WORLD_WIDTH, 5))
+    rewards_sarsa2 = []
+    epsilon2 = list[1]
+
+    q_sarsa3 = np.zeros((WORLD_HEIGHT, WORLD_WIDTH,WORLD_HEIGHT, WORLD_WIDTH, 5))
+    rewards_sarsa3 = []
+    epsilon3 = list[2]
+
+    q_sarsa4 = np.zeros((WORLD_HEIGHT, WORLD_WIDTH,WORLD_HEIGHT, WORLD_WIDTH, 5))
+    rewards_sarsa4 = []
+    epsilon4 = list[3]
+
+    q_sarsa5 = np.zeros((WORLD_HEIGHT, WORLD_WIDTH,WORLD_HEIGHT, WORLD_WIDTH, 5))
+    rewards_sarsa5 = []
+    epsilon5 = list[4]
+
+
+    x_axis = []
+
+    for i in range(0, episodes):
+        print("Episode: " + str(i))
+        x_axis.append(i*steps)
+        rewards_sarsa1.append(sarsa(q_sarsa1, steps, i, epsilon1))
+        rewards_sarsa2.append(sarsa(q_sarsa2, steps, i, epsilon2))
+        rewards_sarsa3.append(sarsa(q_sarsa3, steps, i, epsilon3))
+        rewards_sarsa4.append(sarsa(q_sarsa4, steps, i, epsilon4))
+        rewards_sarsa5.append(sarsa(q_sarsa5, steps, i, epsilon5))
+
+
+    plt.plot(x_axis,rewards_sarsa1,label='0.05')
+    plt.plot(x_axis,rewards_sarsa2,label='0.1')
+    plt.plot(x_axis,rewards_sarsa3,label='0.2')
+    plt.plot(x_axis,rewards_sarsa4,label='0.3')
+    plt.plot(x_axis,rewards_sarsa5,label='0.4')
+    plt.xlabel('Iterations')
+    plt.ylabel('Value function')
     plt.legend()
 
     plt.savefig('./sarsa_epsilon.png')

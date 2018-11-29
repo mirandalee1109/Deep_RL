@@ -26,8 +26,12 @@ LAMBDA = 0.2
 def robber_step(state, action):
     state = np.array(state)
     next_state = (state + action).tolist()
+    x, y = next_state
+    if x < 0 or x >= WORLD_Y or y < 0 or y >= WORLD_X:
+        # out of boundary
+        next_state = state.tolist()
 
-    return next_state, flag
+    return next_state
 
 
 def police_chase(state, action):
@@ -159,7 +163,7 @@ def value_iteration_inf():
                         act_returns = []
                         for action in ACTIONS:
                             (next_x, next_y) = robber_step([x, y], action)
-                            if next_x != m and next_y != n:# I look up the police, won't step into its cell
+                            if (action[0] == 0 and action[0] == 0) or (next_x != x and next_y != x):
                                 action_value = []
                                 possible_action = policy_dir([x, y], [m, n])
                                 count = len(possible_action)
