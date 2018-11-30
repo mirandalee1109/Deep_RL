@@ -20,27 +20,23 @@ ACTIONS_police = [np.array([0, -1]),
                   np.array([0, 1]),
                   np.array([1, 0])]
 
-LAMBDA = 0.2
-
 
 def robber_step(state, action):
+    flag = True
     state = np.array(state)
     next_state = (state + action).tolist()
     x, y = next_state
     if x < 0 or x >= WORLD_Y or y < 0 or y >= WORLD_X:
         # out of boundary
+        flag = False
         next_state = state.tolist()
 
-    return next_state
+    return next_state, flag
 
 
 def police_chase(state, action):
     state = np.array(state)
     next_state = (state + action).tolist()
-    x, y = next_state
-    if x < 0 or x >= WORLD_Y or y < 0 or y >= WORLD_X:
-        # out of boundary
-        next_state = state.tolist()
 
     return next_state
 
@@ -66,7 +62,7 @@ ACTIONS_police = [np.array([0, -1]),
                   np.array([1, 0])]
 '''
 # left,up,right,down,stay
-def policy_dir(robber, police):
+def police_dir(robber, police):
     x, y = robber
     m, n = police
     action = []
@@ -131,7 +127,7 @@ def policy_dir(robber, police):
             return action
 
 
-def value_iteration_inf():
+def value_iteration_inf(LAMBDA=0.2):
     # state value
     #reward = np.full((WORLD_Y, WORLD_X), 0)
     reward_bank = 10 # at the bank
@@ -149,7 +145,7 @@ def value_iteration_inf():
     iteration = 0
 
     while True:
-        new_state_value = np.copy(state_value)
+        #new_state_value = np.copy(state_value)
         for m in range(0, WORLD_Y):
             for n in range(0, WORLD_X):
                 # all possible positions of police
@@ -162,12 +158,12 @@ def value_iteration_inf():
                         action_returns = []
                         act_returns = []
                         for action in ACTIONS:
-                            (next_x, next_y) = robber_step([x, y], action)
-                            if (action[0] == 0 and action[0] == 0) or (next_x != x and next_y != x):
+                            (next_x, next_y),flag = robber_step([x, y], action)
+                            if (flag):
                                 action_value = []
-                                possible_action = policy_dir([x, y], [m, n])
+                                possible_action = police_dir([x, y], [m, n])
                                 count = len(possible_action)
-                                # count of the num of police to go in each direction
+                                    # count of the num of police to go in each direction
                                 prob_state = 1/count
                                 for act in possible_action:
                                     (next_m, next_n) = police_chase([m, n], act)
@@ -183,19 +179,18 @@ def value_iteration_inf():
 
 
                         new_value = np.max(action_returns)
-                        new_state_value[x][y][m][n] = new_value
+                        state_value[x][y][m][n] = new_value
                         argument = act_returns[np.argmax(action_returns)]
                         policy[x][y][m][n] = index(argument)
 
-        state_value = new_state_value
+        #state_value = new_state_value
         if np.sum(np.square(state_value - value)) < 1e-200:
             break
         else:
             value = state_value.copy()
             iteration += 1
 
-    #print(policy[2][3][0][0])
-    return policy
+    return state_value
 
 
 if __name__ == '__main__':
