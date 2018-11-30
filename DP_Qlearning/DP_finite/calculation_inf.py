@@ -26,25 +26,32 @@ def step(state, action):
     state = np.array(state)
     next_state = (state + action).tolist()
     x, y = next_state
+    flag = True
     if x < 0 or x >= WORLD_Y or y < 0 or y >= WORLD_X:# out of boundary
         next_state = state.tolist()
+        flag = False
     if 0 <= x <= 2:
         if (y_== 1 and y == 2) or (y_ == 2 and y == 1):
             next_state = state.tolist()
+            flag = False
         if 1 <= x <= 2:
             if (y_== 3 and y == 4) or (y_ == 4 and y == 3):
                 next_state = state.tolist()
+                flag = False
     if 4 <= y <= 5:
         if (x_== 1 and x == 2) or (x_ == 2 and x == 1):
             next_state = state.tolist()
+            flag = False
     if 1 <= y <= 4:
         if (x_== 3 and x == 4) or (x_ == 4 and x == 3):
             next_state = state.tolist()
+            flag = False
     if x == 4:
         if (y_ == 3 and y == 4) or (y_ == 4 and y == 3):
             next_state = state.tolist()
+            flag = False
 
-    return next_state
+    return next_state, flag
 
 
 def minotaur_step(state, action):
@@ -100,8 +107,8 @@ def value_iteration_inf():
                         action_returns = []
                         act_returns = []
                         for action in ACTIONS:
-                            (next_x, next_y) = step([x, y], action)
-                            if (next_x != x or next_y != y):
+                            (next_x, next_y), flag = step([x, y], action)
+                            if (flag):
                                 action_value = []
                                 count = 4
                                 # count of the num of min to go in each dir
@@ -110,20 +117,20 @@ def value_iteration_inf():
                                     if (next_m == m and next_n == n):
                                         count -= 1 # this action is not applicable
 
-                                prob_state = (1-(1/30))/count # prob of min going each dir
+                                prob_state = 1/count # prob of min going each dir
 
                                 for act in ACTIONS_MIN:
                                     (next_m, next_n) = minotaur_step([m, n], act)
                                     if (next_m != m or next_n != n):
                                         if (next_m == next_x) and (next_n == next_y): # end up in the same cell
-                                            action_value.append(np.round(prob_state * (reward_death + LAMBDA * state_value[next_x, next_y, next_m, next_n])+
-                                                                1/30 * (reward_death + LAMBDA * state_value[next_x, next_y, next_m, next_n]), 4))
+                                            action_value.append(np.round(prob_state * (reward_death + LAMBDA * state_value[next_x, next_y, next_m, next_n]), 4))
+                                                                #1/30 * (reward_death + LAMBDA * state_value[next_x, next_y, next_m, next_n])
                                         elif next_x == 4 and next_y == 4:# win
-                                            action_value.append(np.round(prob_state * (reward_win + LAMBDA * state_value[next_x, next_y, next_m, next_n])+
-                                                                1/30 * (reward_death + LAMBDA * state_value[next_x, next_y, next_m, next_n]), 4))
+                                            action_value.append(np.round(prob_state * (reward_win + LAMBDA * state_value[next_x, next_y, next_m, next_n]), 4))
+                                                                #1/30 * (reward_death + LAMBDA * state_value[next_x, next_y, next_m, next_n]), 4))
                                         else:
-                                            action_value.append(np.round(prob_state * (LAMBDA * state_value[next_x, next_y, next_m, next_n]) +
-                                                                1/30 * (reward_death + LAMBDA * state_value[next_x, next_y, next_m, next_n]), 4))
+                                            action_value.append(np.round(prob_state * (LAMBDA * state_value[next_x, next_y, next_m, next_n]), 4))
+                                                                #1/30 * (reward_death + LAMBDA * state_value[next_x, next_y, next_m, next_n]), 4))
 
                                 action_returns.append(LAMBDA*np.sum(action_value))
                                 act_returns.append(action)
