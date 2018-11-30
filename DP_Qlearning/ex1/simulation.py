@@ -135,6 +135,8 @@ def simulate(policy, T):
         #Moving the player
         new_pos_player = pos_player + ACTIONS[policy[pos_player[0]][pos_player[1]][pos_min[0]][pos_min[1]]]
 
+
+
         player_path.append(new_pos_player)
         min_path.append(min_move(pos_min))
 
@@ -167,6 +169,8 @@ def simulate_inf(policy):
 
         #Moving the player
         new_pos_player = pos_player + ACTIONS[policy[pos_player[0]][pos_player[1]][pos_min[0]][pos_min[1]]]
+        if np.random.binomial(1, 1/30) == 1:
+            break
 
         player_path.append(new_pos_player)
         min_path.append(min_move(pos_min))
@@ -188,6 +192,7 @@ if __name__ == '__main__':
 
     #Example for drawing
     #policy = value_iteration_inf()
+    '''
     policy = value_iteration(15)
     #
     #
@@ -225,6 +230,7 @@ if __name__ == '__main__':
     plt.savefig('./graph.png')
     plt.close()
 
+    '''
 
 
     #For 1_c

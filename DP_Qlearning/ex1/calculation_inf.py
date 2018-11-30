@@ -19,7 +19,7 @@ ACTIONS_MIN = [np.array([0, -1]),
                np.array([0, 1]),
                np.array([1, 0])]
 
-LAMBDA = 1/30
+LAMBDA = 0.9
 
 def step(state, action):
     x_, y_ = state
@@ -110,17 +110,20 @@ def value_iteration_inf():
                                     if (next_m == m and next_n == n):
                                         count -= 1 # this action is not applicable
 
-                                prob_state = 1/count # prob of min going each dir
+                                prob_state = (1-(1/30))/count # prob of min going each dir
 
                                 for act in ACTIONS_MIN:
                                     (next_m, next_n) = minotaur_step([m, n], act)
                                     if (next_m != m or next_n != n):
                                         if (next_m == next_x) and (next_n == next_y): # end up in the same cell
-                                            action_value.append(np.round(prob_state * (reward_death + LAMBDA * state_value[next_x, next_y, next_m, next_n]), 4))
+                                            action_value.append(np.round(prob_state * (reward_death + LAMBDA * state_value[next_x, next_y, next_m, next_n])+
+                                                                1/30 * (reward_death + LAMBDA * state_value[next_x, next_y, next_m, next_n]), 4))
                                         elif next_x == 4 and next_y == 4:# win
-                                            action_value.append(np.round(prob_state * (reward_win + LAMBDA * state_value[next_x, next_y, next_m, next_n]), 4))
+                                            action_value.append(np.round(prob_state * (reward_win + LAMBDA * state_value[next_x, next_y, next_m, next_n])+
+                                                                1/30 * (reward_death + LAMBDA * state_value[next_x, next_y, next_m, next_n]), 4))
                                         else:
-                                            action_value.append(np.round(prob_state * (LAMBDA * state_value[next_x, next_y, next_m, next_n]), 4))
+                                            action_value.append(np.round(prob_state * (LAMBDA * state_value[next_x, next_y, next_m, next_n]) +
+                                                                1/30 * (reward_death + LAMBDA * state_value[next_x, next_y, next_m, next_n]), 4))
 
                                 action_returns.append(LAMBDA*np.sum(action_value))
                                 act_returns.append(action)
@@ -132,11 +135,15 @@ def value_iteration_inf():
                         policy[x][y][m][n] = index(argument)
 
         state_value = new_state_value
+        iteration += 1
+
         if np.sum(np.square(state_value - value)) < 1e-200:
             break
         else:
             value = state_value.copy()
-            iteration += 1
+
+
+    print(iteration)
 
     return policy
 

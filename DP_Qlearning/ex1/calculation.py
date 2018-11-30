@@ -136,7 +136,7 @@ def value_iteration(T):
         state_value = new_state_value
         t += 1
 
-    #print(t)
+    print(t)
 
     return policy
 
