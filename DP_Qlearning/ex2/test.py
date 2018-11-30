@@ -134,8 +134,8 @@ def value_iteration_inf(LAMBDA=0.2):
     reward_caught = -50 # death
 
     robber_init = (0, 0)
-    police_init = (2, 1)
-    bank_pos = ((0, 0), (5, 0), (0, 2), (5, 2))
+    police_init = (1, 2)
+    bank_pos = ((0, 0), (0, 5), (2, 0), (2, 5))
 
     state_value = np.zeros((WORLD_Y, WORLD_X, WORLD_Y, WORLD_X))# me position & minotaur position
     policy = np.full((WORLD_Y, WORLD_X, WORLD_Y, WORLD_X), -1)
@@ -190,7 +190,7 @@ def value_iteration_inf(LAMBDA=0.2):
             value = state_value.copy()
             iteration += 1
 
-    return state_value
+    return state_value, policy
 
 
 if __name__ == '__main__':

@@ -91,9 +91,9 @@ def police_dir(robber, police):
             if m > 0:
                 action.append(ACTIONS_police[1])#up
             return action
-'''
+
 #For plotting the example execution
-def draw_image(robber_path, police_path, name):
+def draw_image(policy, name):
     fig, ax = plt.subplots()
     ax.set_axis_off()
     tb = Table(ax, bbox=[0, 0, 1, 1])
@@ -109,18 +109,23 @@ def draw_image(robber_path, police_path, name):
             color = 'white'
 
             #bank
-            if (i, j) in bank_pos:
-                tb.add_cell(i, j, width, height,
-                            loc='center', edgecolor='#63b1f2', facecolor='#9bb4db')
-            else:
-                tb.add_cell(i, j, width, height,
-                            loc='center', edgecolor='#63b1f2', facecolor=color)
-            #Start
+            if (j, i) in bank_pos:
+                color = '#9bb4db'
 
-            elif i==0 and j==0:
-                tb.add_cell(i, j, width, height,
-                            loc='center', edgecolor='#63b1f2', facecolor='#9fe592')
+            if policy[i][j][1][2] == -1:
+                text = "Police"
+            elif policy[i][j][1][2] == 0:
+                text= "Left"
+            elif policy[i][j][1][2] == 1:
+                text= "Up"
+            elif policy[i][j][1][2] == 2:
+                text= "Right"
+            elif policy[i][j][1][2] == 3:
+                text= "Down"
+            elif policy[i][j][1][2] == 4:
+                text= "Stay"
 
+            tb.add_cell(i, j, width, height, text=text, loc='center', edgecolor='#63b1f2', facecolor=color)
     # Row Labels...
 
     for i, label in enumerate(range(WORLD_Y)):
@@ -139,72 +144,13 @@ def draw_image(robber_path, police_path, name):
 
     ax.add_collection(lc)
 
-    walls = [[(2/6, 1), (2/6, 2/5)], [(4/6, 4/5), (4/6, 2/5)], [(4/6, 3/5), (1, 3/5)], [(1/6, 1/5), (5/6, 1/5)], [(4/6, 1/5), (4/6, 0)]]
-    lc = mc.LineCollection(walls, colors='k', linewidths=2)
-
-    ax.add_collection(lc)
 
 
-    #Paths
-    #May need improvements
-    last = ((player_path[0][1] + 0.5)/6,(4.5-player_path[0][0])/5)
-    path=[]
-    for k in range(len(player_path)):
-        path.append([last,((player_path[k][1] + 0.5)/6,(4.5-player_path[k][0])/5)])
-        last = ((player_path[k][1] + 0.5)/6,(4.5-player_path[k][0])/5)
 
-    lc = mc.LineCollection(path, colors='r', linewidths=2)
-
-    ax.add_collection(lc)
-
-
-    last = ((min_path[0][1] + 0.35)/6,(4.65-min_path[0][0])/5)
-    path=[]
-    for k in range(len(min_path)):
-        path.append([last,((min_path[k][1] + 0.35)/6,(4.65-min_path[k][0])/5)])
-        last = ((min_path[k][1] + 0.35)/6,(4.65-min_path[k][0])/5)
-
-    lc = mc.LineCollection(path, colors='b', linewidths=2)
-
-    ax.add_collection(lc)
-
-    plt.savefig(name)
+    plt.savefig('lambda' + name + '.png')
     plt.close()
 
 
-#Simulating with maximum time T and action grid given
-def simulate(policy, T):
-    #Starting positions
-    min_path=[[4,4]]
-    player_path = [[0,0]]
-
-    #Checking if we have won or not
-    win = False
-
-
-    for t in range(T):
-        #Where each one is
-        pos_min = min_path[-1]
-        pos_player = player_path[-1]
-
-        #Moving the player
-        new_pos_player = pos_player + ACTIONS[policy[pos_player[0]][pos_player[1]][pos_min[0]][pos_min[1]]]
-
-
-        player_path.append(new_pos_player)
-        min_path.append(min_move(pos_min))
-
-        #If won
-        if new_pos_player[0] == 4 and new_pos_player[1] == 4:
-            win = True
-            break
-        #If eaten by minotaur
-        elif new_pos_player[0] == min_path[-1][0] and new_pos_player[1] == min_path[-1][1]:
-            break
-
-
-    return player_path, min_path, win
-'''
 
 #Moving the police toward robber
 def police_move(position, actions):
@@ -227,7 +173,7 @@ def robber_step(position, actions):
 #Simulating with inf time and action grid given
 def simulate_inf(policy):
     #initialzed positions
-    police_path=[[2,1]]
+    police_path=[[1,2]]
     robber_path = [[0,0]]
 
     #Checking if we have won or not
@@ -242,11 +188,9 @@ def simulate_inf(policy):
         a = policy[robber_pos[0]][robber_pos[1]][police_pos[0]][police_pos[1]]
         #Moving the player
         new_robber_pos = robber_step(robber_pos, ACTIONS[a])
-        print(new_robber_pos)
         actions = police_dir(robber_pos, police_pos)
         #print(actions)
         new_police_pos = police_move(police_pos, actions)
-        print(new_police_pos)
         robber_path.append(new_robber_pos)
         police_path.append(new_police_pos)
         #print(reward)
@@ -266,32 +210,26 @@ def simulate_inf(policy):
 
 if __name__ == '__main__':
 
+    lambdas = [0.5,0.5,0.7,0.9]
 
-    #Example for drawing
-    #policy = value_iteration_inf()
-    #
-    #
-    #robber_path, police_path, reward = simulate_inf(policy)
-    #print(robber_path)
-    #print(police_path)
-    #print(reward)
-    #
-    #draw_image(robber_path, police_path, './example.png')
-    #
-    #
+    for lamb in lambdas:
+        state_value, policy = value_iteration_inf(lamb)
+        draw_image(policy, str(lamb))
+
+
     result = []
     episodes = []
     for LAMBDA in range(100):
-        state_value = value_iteration_inf(LAMBDA/100)
-        result.append(state_value[0,0,2,1])
+        print(LAMBDA)
+        state_value,police = value_iteration_inf(LAMBDA/100)
+        result.append(state_value[0,0,1,2])
         #print(result)
         episodes.append(LAMBDA/100)
 
 
     plt.plot(episodes, result)
-    plt.xlabel('LAMBDA')
-    plt.ylabel('initial value function')
-    plt.legend()
+    plt.xlabel('Lambda')
+    plt.ylabel('Initial value function')
     plt.savefig('./try.png')
     plt.close()
 
@@ -300,48 +238,16 @@ if __name__ == '__main__':
     wins = []
 
 '''
-    #Simulations
-    for t in range(0,120):
-        win_counter = 0
-        total_simulations = 10000
-        policy = value_iteration(t)
-
-        for i in range(total_simulations):
-            _, _, win = simulate(policy, t)
-
-            if win:
-                win_counter += 1
-
-        print("T:" + str(t))
-        print("Total wins:" + str(win_counter))
-        print("Out of:" + str(total_simulations))
-        print("-------------------------")
-        time.append(t)
-        wins.append(float(win_counter)/(total_simulations/100))
-
-    plt.plot(np.asarray(time),np.asarray(wins))
-    plt.xlabel("T")
-    plt.ylabel("Win %")
-    plt.savefig('./graph.png')
-    plt.close()
-
-
-
-    #For 1_c
     print("start!")
-    policy_inf = value_iteration_inf()
+    state_value, policy_inf = value_iteration_inf(0.8)
     print("policy Done!")
-
-    player_path, min_path, _ = simulate_inf(policy_inf)
-    print("simulate done!")
-
-    #draw_image(player_path, min_path,'./example_inf.png')
 
 
     win_counter = 0
     total_simulations = 10000
 
     for i in range(total_simulations):
+        print(i)
         _, _, win = simulate_inf(policy_inf)
 
         if win:
