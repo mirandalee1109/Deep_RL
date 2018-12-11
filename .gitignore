@@ -1,3 +1,6 @@
 *.png
 .DS_Store
 **/__pycache__/
+!/Lab2/**/*.png
+/Lab2/**/qvalues.png
+/Lab2/**/scores.png

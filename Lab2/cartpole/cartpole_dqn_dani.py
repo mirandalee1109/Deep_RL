@@ -15,7 +15,7 @@ EPISODES = 1000 #Maximum number of episodes
 class DQNAgent:
     #Constructor for the agent (invoked when DQN is first called in main)
     def __init__(self, state_size, action_size):
-        self.check_solve = False	#If True, stop if you satisfy solution confition
+        self.check_solve = True	#If True, stop if you satisfy solution confition
         self.render = False        #If you want to see Cartpole learning, then change to True
 
         #Get size of state and action
@@ -56,12 +56,13 @@ class DQNAgent:
         #Tip: Consult https://keras.io/getting-started/sequential-model-guide/
     def build_model(self):
         model = Sequential()
-        model.add(Dense(16, input_dim=self.state_size, activation='relu',
+        model.add(Dense(26, input_dim=self.state_size, activation='relu',
                         kernel_initializer='he_uniform'))
         model.add(Dense(self.action_size, activation='linear',
                         kernel_initializer='he_uniform'))
         model.summary()
         model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate))
+
         return model
 ###############################################################################
 ###############################################################################
@@ -172,6 +173,7 @@ if __name__ == "__main__":
             state = next_state
 
     scores, episodes = [], [] #Create dynamically growing score and episode counters
+    mean_scores = []
     for e in range(EPISODES):
         done = False
         score = 0
@@ -205,6 +207,8 @@ if __name__ == "__main__":
                 #Plot the play time for every episode
                 scores.append(score)
                 episodes.append(e)
+                mean_scores.append(np.mean(scores[-min(100, len(scores)):]))
+
 
                 print("episode:", e, "  score:", score," q_value:", max_q_mean[e],"  memory length:",
                       len(agent.memory))
@@ -217,3 +221,8 @@ if __name__ == "__main__":
                         agent.plot_data(episodes,scores,max_q_mean[:e+1])
                         sys.exit()
     agent.plot_data(episodes,scores,max_q_mean)
+    pylab.figure(2)
+    pylab.plot(episodes, mean_scores, 'b')
+    pylab.xlabel("Episodes")
+    pylab.ylabel("Mean Score")
+    pylab.savefig("mean_score_26_neurons.png")
