@@ -56,8 +56,11 @@ class DQNAgent:
         #Tip: Consult https://keras.io/getting-started/sequential-model-guide/
     def build_model(self):
         model = Sequential()
-        model.add(Dense(26, input_dim=self.state_size, activation='relu',
+        model.add(Dense(16, input_dim=self.state_size, activation='relu',
                         kernel_initializer='he_uniform'))
+        model.add(Dense(10, activation='linear',
+                        kernel_initializer='he_uniform'))
+
         model.add(Dense(self.action_size, activation='linear',
                         kernel_initializer='he_uniform'))
         model.summary()
@@ -81,7 +84,7 @@ class DQNAgent:
         if np.random.binomial(1, self.epsilon) == 1:
             action = random.randrange(self.action_size)
         else:
-            action = np.argmax(self.target_model.predict(state)[0])
+            action = np.argmax(self.model.predict(state)[0])
 
         return action
 ###############################################################################
@@ -225,4 +228,4 @@ if __name__ == "__main__":
     pylab.plot(episodes, mean_scores, 'b')
     pylab.xlabel("Episodes")
     pylab.ylabel("Mean Score")
-    pylab.savefig("mean_score_26_neurons.png")
+    pylab.savefig("mean_score_initial_2 .png")
