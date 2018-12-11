@@ -15,7 +15,7 @@ EPISODES = 1000 #Maximum number of episodes
 class DQNAgent:
     #Constructor for the agent (invoked when DQN is first called in main)
     def __init__(self, state_size, action_size):
-        self.check_solve = True	#If True, stop if you satisfy solution confition
+        self.check_solve = False	#If True, stop if you satisfy solution confition
         self.render = False        #If you want to see Cartpole learning, then change to True
 
         #Get size of state and action
@@ -31,7 +31,7 @@ class DQNAgent:
         self.batch_size = 32 #Fixed
         self.memory_size = 1000
         self.train_start = 1000 #Fixed
-        self.target_update_frequency = 3
+        self.target_update_frequency = 1
 ################################################################################
 ################################################################################
 
@@ -58,20 +58,10 @@ class DQNAgent:
         model = Sequential()
         model.add(Dense(16, input_dim=self.state_size, activation='relu',
                         kernel_initializer='he_uniform'))
-        '''
-        model.add(Dense(50, activation='linear',
-                        kernel_initializer='he_uniform'))
-
-        model.add(Dense(30, activation='linear',
-                        kernel_initializer='he_uniform'))
-        '''
-
         model.add(Dense(self.action_size, activation='linear',
                         kernel_initializer='he_uniform'))
-
         model.summary()
         model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate))
-
         return model
 ###############################################################################
 ###############################################################################
@@ -87,11 +77,7 @@ class DQNAgent:
         #Insert your e-greedy policy code here
         #Tip 1: Use the random package to generate a random action.
         #Tip 2: Use keras.model.predict() to compute Q-values from the state.
-        if np.random.binomial(1, self.epsilon) == 1:
-            action = random.randrange(self.action_size)
-        else:
-            action = np.argmax(self.model.predict(state)[0])
-
+        action = random.randrange(self.action_size)
         return action
 ###############################################################################
 ###############################################################################
@@ -127,10 +113,7 @@ class DQNAgent:
         #Tip 1: Observe that the Q-values are stored in the variable target
         #Tip 2: What is the Q-value of the action taken at the last state of the episode?
         for i in range(self.batch_size): #For every batch
-            if done[i]:
-                target[i][action[i]] = reward[i]
-            else:
-                target[i][action[i]] = reward[i] + self.discount_factor * np.max(target_val[i])
+            target[i][action[i]] = random.randint(0,1)
 ###############################################################################
 ###############################################################################
 
@@ -157,8 +140,10 @@ if __name__ == "__main__":
     env = gym.make('CartPole-v0') #Generate Cartpole-v0 environment object from the gym library
     #Get state and action sizes from the environment
     state_size = env.observation_space.shape[0]
+    print("state size", state_size)
     action_size = env.action_space.n
-
+    print("action size", action_size)
+    '''
     #Create agent, see the DQNAgent __init__ method for details
     agent = DQNAgent(state_size, action_size)
 
@@ -182,7 +167,6 @@ if __name__ == "__main__":
             state = next_state
 
     scores, episodes = [], [] #Create dynamically growing score and episode counters
-    mean_scores = []
     for e in range(EPISODES):
         done = False
         score = 0
@@ -216,8 +200,6 @@ if __name__ == "__main__":
                 #Plot the play time for every episode
                 scores.append(score)
                 episodes.append(e)
-                mean_scores.append(np.mean(scores[-min(100, len(scores)):]))
-
 
                 print("episode:", e, "  score:", score," q_value:", max_q_mean[e],"  memory length:",
                       len(agent.memory))
@@ -230,8 +212,4 @@ if __name__ == "__main__":
                         agent.plot_data(episodes,scores,max_q_mean[:e+1])
                         sys.exit()
     agent.plot_data(episodes,scores,max_q_mean)
-    pylab.figure(2)
-    pylab.plot(episodes, mean_scores, 'b')
-    pylab.xlabel("Episodes")
-    pylab.ylabel("Mean Score")
-    pylab.savefig("mean_score_3_update .png")
+    '''
