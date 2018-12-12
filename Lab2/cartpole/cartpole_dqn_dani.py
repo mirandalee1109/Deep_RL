@@ -31,7 +31,7 @@ class DQNAgent:
         self.batch_size = 32 #Fixed
         self.memory_size = 1000
         self.train_start = 1000 #Fixed
-        self.target_update_frequency = 3
+        self.target_update_frequency = 10
 ################################################################################
 ################################################################################
 
@@ -234,4 +234,4 @@ if __name__ == "__main__":
     pylab.plot(episodes, mean_scores, 'b')
     pylab.xlabel("Episodes")
     pylab.ylabel("Mean Score")
-    pylab.savefig("mean_score_3_update .png")
+    pylab.savefig("mean_score_10_update .png")
