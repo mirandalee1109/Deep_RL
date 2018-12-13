@@ -15,7 +15,7 @@ EPISODES = 1000 #Maximum number of episodes
 class DQNAgent:
     #Constructor for the agent (invoked when DQN is first called in main)
     def __init__(self, state_size, action_size):
-        self.check_solve = True	#If True, stop if you satisfy solution confition
+        self.check_solve = False	#If True, stop if you satisfy solution confition
         self.render = False        #If you want to see Cartpole learning, then change to True
 
         #Get size of state and action
@@ -25,13 +25,13 @@ class DQNAgent:
 ################################################################################
 ################################################################################
         #Set hyper parameters for the DQN. Do not adjust those labeled as Fixed.
-        self.discount_factor = 0.95
+        self.discount_factor = 0.999
         self.learning_rate = 0.005
         self.epsilon = 0.02 #Fixed
         self.batch_size = 32 #Fixed
         self.memory_size = 1000
         self.train_start = 1000 #Fixed
-        self.target_update_frequency = 10
+        self.target_update_frequency = 1
 ################################################################################
 ################################################################################
 
@@ -234,4 +234,4 @@ if __name__ == "__main__":
     pylab.plot(episodes, mean_scores, 'b')
     pylab.xlabel("Episodes")
     pylab.ylabel("Mean Score")
-    pylab.savefig("mean_score_10_update .png")
+    pylab.savefig("mean_score_discount_999.png")
